@@ -45,6 +45,7 @@ def doc2num(s, maxlen):
     return list(abc[s])
 
 
+# 讲训练数据集的每个sample句子转化为对应的数字list
 all_['doc2num'] = all_[0].apply(lambda s: doc2num(s, maxlen))
 
 # 手动打乱数据
@@ -83,9 +84,8 @@ model.compile(loss='binary_crossentropy',
 batch_size = 512
 train_num = 15000
 
-# 不足则补全0行
 
-
+# 对句子中的每个数字进行onehot编码，不足maxlen的时候则补全0行
 def gen_matrix(z):
     return np.vstack((np_utils.to_categorical(z, len(abc)), np.zeros((maxlen - len(z), len(abc)))))
 
