@@ -16,6 +16,20 @@ import sys
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
+# class Logger(object):
+#     def __init__(self, filename="Default.log"):
+#         self.terminal = sys.stdout
+#         self.log = open(filename, "a")
+
+#     def write(self, message):
+#         self.terminal.write(message)
+#         self.log.write(message)
+
+#     def flush(self):
+#         pass
+
+
+# sys.stdout = Logger("logger.txt")
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 config = K.tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -74,14 +88,14 @@ model.add(Dropout(0.5))
 model.add(Dense(1))
 model.add(Activation('sigmoid'))
 model.compile(loss='binary_crossentropy',
-              optimizer='rmsprop',
+              optimizer='adam',
               metrics=['accuracy'])
 
 # 单个one hot矩阵的大小是maxlen*len(abc)的，非常消耗内存
 # 为了方便低内存的PC进行测试，这里使用了生成器的方式来生成one hot矩阵
 # 仅在调用时才生成one hot矩阵
 # 可以通过减少batch_size来降低内存使用，但会相应地增加一定的训练时间
-batch_size = 512
+batch_size = 256
 train_num = 15000
 
 
@@ -112,7 +126,7 @@ checkpoint = ModelCheckpoint(filepath=model_path,
 
 
 model.fit_generator(data_generator(
-    x[:train_num], y[:train_num], batch_size), steps_per_epoch=train_num // batch_size, epochs=30, callbacks=[checkpoint],
+    x[:train_num], y[:train_num], batch_size), steps_per_epoch=train_num // batch_size, epochs=90, callbacks=[checkpoint],
     validation_data=data_generator(x[train_num:], y[train_num:], batch_size), validation_steps=len(x[train_num:]) // batch_size)
 
 # model.evaluate_generator(data_generator(
